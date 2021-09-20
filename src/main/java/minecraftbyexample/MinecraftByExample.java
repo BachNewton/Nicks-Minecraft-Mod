@@ -2,6 +2,7 @@ package minecraftbyexample;
 
 import minecraftbyexample.usefultools.debugging.ForgeLoggerTweaker;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -67,6 +68,7 @@ public class MinecraftByExample {
 
     // Get an instance of the mod event bus
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
 
     // Get an instance of the event registrar that is used to bind events to the mod event bus
     // this is a separate class to allow us to use `safeRunWhenOn` instead of the deprecated
@@ -108,15 +110,19 @@ public class MinecraftByExample {
     //   See the comments in DistExecutor class for more context.
     //  This is the reason that the ClientOnlyEvents are split into a completely-separate class.
 
-    registerCommonEvents(modEventBus);
+    registerCommonFMLEvents(modEventBus);
+    registerCommonForgeEvents(forgeEventBus);
     DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientSideOnlyModEventRegistrar::registerClientOnlyEvents);
   }
 
+  private void registerCommonForgeEvents(IEventBus eventBus) {
+    eventBus.register(minecraftbyexample.dream_food.StartupCommon.class);
+  }
 
   /**
    * Register common events for both dedicated servers and clients. This method is safe to call directly.
    */
-  public void registerCommonEvents(IEventBus eventBus) {
+  public void registerCommonFMLEvents(IEventBus eventBus) {
     eventBus.register(minecraftbyexample.mbe01_block_simple.StartupCommon.class);
     eventBus.register(minecraftbyexample.mbe02_block_partial.StartupCommon.class);
     eventBus.register(minecraftbyexample.mbe03_block_variants.StartupCommon.class);
@@ -145,5 +151,4 @@ public class MinecraftByExample {
     //----------------
     eventBus.register(minecraftbyexample.usefultools.debugging.StartupCommon.class);
   }
-
 }
